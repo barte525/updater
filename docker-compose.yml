@@ -1,27 +1,28 @@
 version: "3.8"
 
 services:
-    django:
+    django_u:
         build: .
-        container_name: django
+        container_name: django_u
         command: python manage.py runserver 0.0.0.0:8000
         volumes:
             - .:/usr/src/app
         ports:
             - "8000:8000"
         depends_on:
-            - db
+            - db_u
             - redis
-    db:
+    db_u:
         image: postgres
-        container_name: db
+        container_name: db_u
         env_file:
             - ./crypto/.env
         volumes:
          - data:/var/lib/posgresql/data
-    celery:
+    celery_u:
         build: .
         command: celery -A crypto worker -l INFO
+        container_name: celery_u
         volumes:
             - .:/usr/src/app
         environment:
@@ -30,12 +31,14 @@ services:
             - CELERY_BROKER=redis://redis:6379/0
             - CELERY_BACKEND=redis://redis:6379/0
         depends_on:
-            - django
+            - django_u
             - redis
     redis:
+        container_name: redis
         image: "redis:alpine"
-    celery-beat:
+    celery-beat_u:
         build: .
+        container_name: celery-beat_u
         command: celery -A crypto beat -l info
         volumes:
             - .:/usr/src/app
@@ -45,8 +48,8 @@ services:
             - CELERY_BROKER=redis://redis:6379/0
             - CELERY_BACKEND=redis://redis:6379/0
         depends_on:
-            - django
+            - django_u
             - redis
-            - celery
+            - celery_u
 volumes:
   data:

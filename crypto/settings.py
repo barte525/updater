@@ -13,10 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from celery.schedules import crontab
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -27,7 +25,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'HOST': 'db_u',
         'PORT': 5432,
     }
 }
@@ -70,15 +68,6 @@ env = environ.Env()
 environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY')
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# Application definition
-
-
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -90,8 +79,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'crypto.urls'
-
-
 
 WSGI_APPLICATION = 'crypto.wsgi.application'
 
@@ -118,9 +105,30 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '[DJANGO] %(levelname)s %(asctime)s %(module)s '
+                      '%(name)s.%(funcName)s:%(lineno)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        }
+    },
+    'loggers': {
+        'crypto': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+    },
+}
 
 LANGUAGE_CODE = 'en-us'
 
@@ -132,133 +140,108 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BEAT_SCHEDULE = {
-    "btc_usd": {
-        "task": "crypto.tasks.update_bitcoin_price_usd",
-        "schedule": crontab(minute='1,10,20,30,40,50', hour='*'),
-    },
-    "btc_pln": {
-        "task": "crypto.tasks.update_bitcoin_price_pln",
-        "schedule": crontab(minute='2,11,21,31,41,51', hour='*'),
-    },
-    "btc_eur": {
-        "task": "crypto.tasks.update_bitcoin_price_eur",
-        "schedule": crontab(minute='3,12,22,32,42,52', hour='*'),
-    },
     "btc": {
-        "task": "crypto.tasks.update_bitcoin_price_on_server",
-        "schedule": crontab(minute='4,13,23,33,43,53', hour='*'),
-    },
-    "eth_usd": {
-        "task": "crypto.tasks.update_eth_price_usd",
-        "schedule": crontab(minute='5,14,24,34,44,54', hour='*'),
-    },
-    "eth_pln": {
-        "task": "crypto.tasks.update_eth_price_pln",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
-    },
-    "eth_eur": {
-        "task": "crypto.tasks.update_eth_price_eur",
-        "schedule": crontab(minute='7,16,26,36,46,56', hour='*'),
-    },
-    "eth": {
-        "task": "crypto.tasks.update_eth_price_on_server",
-        "schedule": crontab(minute='8,17,27,37,47,57', hour='*'),
-    },
-    "pln_usd": {
-        "task": "crypto.tasks.update_pln_price_usd",
-        "schedule": crontab(minute='1,10,20,30,40,50', hour='*'),
-    },
-    "pln_eur": {
-        "task": "crypto.tasks.update_pln_price_eur",
-        "schedule": crontab(minute='3,12,22,32,42,52', hour='*'),
-    },
-    "pln": {
-        "task": "crypto.tasks.update_pln_price_on_server",
-        "schedule": crontab(minute='4,13,23,33,43,53', hour='*'),
-    },
-    "eur_usd": {
-        "task": "crypto.tasks.update_eur_price_usd",
-        "schedule": crontab(minute='5,14,24,34,44,54', hour='*'),
-    },
-    "eur_pln": {
-        "task": "crypto.tasks.update_eur_price_pln",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
-    },
-    "eur": {
-        "task": "crypto.tasks.update_eur_price_on_server",
-        "schedule": crontab(minute='8,17,27,37,47,57', hour='*'),
-    },
-    "usd_eur": {
-        "task": "crypto.tasks.update_usd_price_eur",
-        "schedule": crontab(minute='5,14,24,34,44,54', hour='*'),
-    },
-    "usd_pln": {
-        "task": "crypto.tasks.update_usd_price_pln",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
-    },
-    "usd": {
-        "task": "crypto.tasks.update_usd_price_on_server",
-        "schedule": crontab(minute='8,17,27,37,47,57', hour='*'),
-    },
-    "gbp_eur": {
-        "task": "crypto.tasks.update_gbp_price_eur",
-        "schedule": crontab(minute='5,14,24,34,44,54', hour='*'),
-    },
-    "gbp_pln": {
-        "task": "crypto.tasks.update_gbp_price_pln",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
-    },
-    "gbp_usd": {
-        "task": "crypto.tasks.update_gbp_price_usd",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
-    },
-    "gbp": {
-        "task": "crypto.tasks.update_gbp_price_on_server",
-        "schedule": crontab(minute='8,17,27,37,47,57', hour='*'),
-    },
-    "gold_eur": {
-        "task": "crypto.tasks.update_gold_price_eur",
-        "schedule": crontab(minute='5,14,24,34,44,54', hour='*'),
-    },
-    "gold_pln": {
-        "task": "crypto.tasks.update_gold_price_pln",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
-    },
-    "gold_usd": {
-        "task": "crypto.tasks.update_gold_price_usd",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='0,15,30,45', hour='*'),
+        "args": ('btc', ),
     },
     "gold": {
-        "task": "crypto.tasks.update_gold_price_on_server",
-        "schedule": crontab(minute='8,17,27,37,47,57', hour='*'),
-    },
-    "silver_eur": {
-        "task": "crypto.tasks.update_silver_price_eur",
-        "schedule": crontab(minute='5,14,24,34,44,54', hour='*'),
-    },
-    "silver_pln": {
-        "task": "crypto.tasks.update_silver_price_pln",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
-    },
-    "silver_usd": {
-        "task": "crypto.tasks.update_silver_price_usd",
-        "schedule": crontab(minute='6,15,25,35,45,55', hour='*'),
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='1,16,31,46', hour='*'),
+        "args": ('gold', ),
     },
     "silver": {
-        "task": "crypto.tasks.update_silver_price_on_server",
-        "schedule": crontab(minute='8,17,27,37,47,57', hour='*'),
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='2,17,32,47', hour='*'),
+        "args": ('silver', )
+    },
+    "platinum": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='3,18,33,48', hour='*'),
+        "args": ('platinum', ),
+    },
+    "eth": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='4,19,34,49', hour='*'),
+        "args": ('eth', ),
+    },
+    "ltc": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='5,20,35,50', hour='*'),
+        "args": ('ltc', )
+    },
+    "eur": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='0,15,30,45', hour='*'),
+        "args": ('eur',),
+    },
+    "pln": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='1,16,31,46', hour='*'),
+        "args": ('pln',),
+    },
+    "jpy": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='2,17,32,47', hour='*'),
+        "args": ('jpy',),
+    },
+    "gbp": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='3,18,33,48', hour='*'),
+        "args": ('gbp',),
+    },
+    "huf": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='4,19,34,49', hour='*'),
+        "args": ('eur',),
+    },
+    "try": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='5,20,35,50', hour='*'),
+        "args": ('try',),
+    },
+    "sek": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='6,21,36,51', hour='*'),
+        "args": ('sek',),
+    },
+    "chf": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='7,22,37,52', hour='*'),
+        "args": ('chf',),
+    },
+    "rub": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='8,23,38,53', hour='*'),
+        "args": ('rub',),
+    },
+    "nok": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='9,24,39,54', hour='*'),
+        "args": ('nok',),
+    },
+    "cad": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='10,25,40,55', hour='*'),
+        "args": ('cad',),
+    },
+    "inr": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='11,26,41,56', hour='*'),
+        "args": ('inr',),
+    },
+    "czk": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='12,27,42,57', hour='*'),
+        "args": ('czk',),
+    },
+    "hrk": {
+        "task": "crypto.tasks.update_asset_price_on_server",
+        "schedule": crontab(minute='13,28,43,58', hour='*'),
+        "args": ('hrk',),
     },
 }
 

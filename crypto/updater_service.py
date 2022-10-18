@@ -7,13 +7,13 @@ from datetime import datetime, timedelta
 NOT_EXIST_ERROR = "Crypto with that name and currency does not exist in database"
 EXTERNAL_API_ERROR = "External api did not send correct response"
 NOT_EXIST_API_ERROR = "Crypto with that name and currency does not exist in external API"
+SERVER_URL = 'mock'
 
 
 class PriceUpdater:
     crypto_url = 'https://api.coingecko.com/api/v3/simple/price'
     metal_url = 'https://api.metals.live/v1/spot'
     currency_url = 'https://api.exchangerate.host/convert?from={}&to={}'
-    server_url = 'mock'
     currencies = ['eur', 'pln', 'jpy', 'gbp', 'huf', 'try', 'sek', 'chf', 'rub', 'nok', 'cad', 'inr', 'czk', 'hrk']
     metals = ['gold', 'silver', 'platinum']
     cryptos = ['btc', 'eth', 'ltc']
@@ -83,7 +83,7 @@ class PriceUpdater:
             'valueUSD': price,
             'dateTime': timestamp,
         }
-        # response = requests.put(self.server_url, json=json_data, verify=False)
+        # response = requests.put(SERVER_URL, json=json_data, verify=False)
         # return response
         self.logger.debug(f"price of {name} was updated on {timestamp}, with new value {price}")
         return json_data

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 NOT_EXIST_ERROR = "Crypto with that name and currency does not exist in database"
 EXTERNAL_API_ERROR = "External api did not send correct response"
 NOT_EXIST_API_ERROR = "Crypto with that name and currency does not exist in external API"
-SERVER_URL = 'mock'
+SERVER_URL = 'http://host.docker.internal:5000/api/asset-values/{}'
 
 
 class PriceUpdater:
@@ -27,7 +27,10 @@ class PriceUpdater:
 
     @staticmethod
     def get_current_date():
-        return datetime.now() + timedelta(hours=2)
+        timestamp = str(datetime.now())
+        timestamp = timestamp.replace(' ', 'T')
+        timestamp += "+00:00"
+        return str(timestamp)
 
     def get_new_crypto_price(self, name, currency_code='USD'):
         name = self.crypto_mapper.get(name, '')
@@ -37,8 +40,7 @@ class PriceUpdater:
         data_table = json.loads(response.read())
         if not data_table:
             return NOT_EXIST_API_ERROR
-        timestamp = self.get_current_date()
-        return float(data_table[name][currency_code.lower()]), timestamp
+        return float(data_table[name][currency_code.lower()])
 
     def get_new_metal_price(self, name):
         name = name.lower()
@@ -50,8 +52,7 @@ class PriceUpdater:
         for data in data_table:
             if data.get(name, '') != '':
                 usd_price = data[name]
-        timestamp = self.get_current_date()
-        return float(usd_price), timestamp
+        return float(usd_price)
 
     def get_new_currency_price(self, name, currency_code='USD'):
         response = urlopen(self.currency_url.format(name, currency_code))
@@ -60,8 +61,7 @@ class PriceUpdater:
         data_table = json.loads(response.read())
         if not data_table:
             return NOT_EXIST_API_ERROR
-        timestamp = self.get_current_date()
-        return float(data_table['info']['rate']), timestamp
+        return float(data_table['info']['rate'])
 
     def get_asset_price(self, name):
         if name in self.cryptos:
@@ -77,13 +77,14 @@ class PriceUpdater:
         if result in self.Errors:
             self.logger.debug(f"An Error occured: {result}")
             return result
-        price, timestamp = result
+        price = result
+        timestamp = self.get_current_date()
         json_data = {
-            'assetName': name,
-            'valueUSD': price,
-            'dateTime': timestamp,
+            'value': price,
+            'timeStamp': timestamp
         }
-        # response = requests.put(SERVER_URL, json=json_data, verify=False)
-        # return response
-        self.logger.debug(f"price of {name} was updated on {timestamp}, with new value {price}")
-        return json_data
+        print(json_data)
+        #print(self.get_current_date())
+        response = requests.post(SERVER_URL.format(name), json=json_data, verify=False)
+        #self.logger.debug(f"price of {name} was updated on {timestamp}, with new value {price}")
+        return response.content

@@ -4,11 +4,11 @@ services:
     django_u:
         build: .
         container_name: django_u
-        command: python manage.py runserver 0.0.0.0:8000
+        command: python manage.py runserver 0.0.0.0:7999
         volumes:
             - .:/usr/src/app
         ports:
-            - "8000:8000"
+            - "7999:7999"
         depends_on:
             - db_u
             - redis

@@ -1,9 +1,11 @@
-version: "3.8"
+version: "3.7"
 
 services:
     django_u:
         build: .
         container_name: django_u
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         command: python manage.py runserver 0.0.0.0:7999
         volumes:
             - .:/usr/src/app

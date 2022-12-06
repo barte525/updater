@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 NOT_EXIST_ERROR = "Crypto with that name and currency does not exist in database"
 EXTERNAL_API_ERROR = "External api did not send correct response"
 NOT_EXIST_API_ERROR = "Crypto with that name and currency does not exist in external API"
-SERVER_URL = 'http://host.docker.internal:5000/api/asset-values/{}'
+SERVER_URL = 'http://104.45.159.232:5000/api/asset-values/{}'
 
 
 class PriceUpdater:

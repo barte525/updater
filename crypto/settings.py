@@ -196,7 +196,7 @@ CELERY_BEAT_SCHEDULE = {
     "huf": {
         "task": "crypto.tasks.update_asset_price_on_server",
         "schedule": crontab(minute='4,19,34,49', hour='*'),
-        "args": ('eur',),
+        "args": ('huf',),
     },
     "try": {
         "task": "crypto.tasks.update_asset_price_on_server",
